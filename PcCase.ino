@@ -16,10 +16,10 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 //#define RST_LED  3
 //#define RST_BTN  4
 #define PWR_LED  5
-#define PWR_BTN  6
-#define HDD_LED  7
+#define PWR_BTN  4 // 6
+#define HDD_LED  6 //7
 #define CAP_OUT  8 // 静電容量スイッチの出力側
-#define CAP_IN   9 // 静電容量スイッチの入力側
+#define CAP_IN   10 // 静電容量スイッチの入力側
 #define BDY_LED 13 //Arduino本体のLED
 
 int maxBrightness = 55;    // 最大の明るさ
@@ -32,7 +32,7 @@ float B = minBrightness;   //Globalで管理する現在の色
 int prevtCap = 0;          //ローパスフィルタ用の前回値（静電容量）
 int tCap = 0;              //パルス立ち上がりまでの時間（静電容量）
 int thresCap = 20;          //静電容量スイッチのオン判断用しきい値
-#define onJudge  30  // 静電容量スイッチの判定をするための判断数
+#define onJudge  5  // 静電容量スイッチの判定をするための判断数
 int onFlgs[onJudge];     // 静電容量スイッチの判定をするためのハコ
 
 void setup() {
@@ -51,8 +51,8 @@ void setup() {
   Serial.begin(115200);
 
   // inputPin
-  pinMode(PWR_LED, INPUT);
-  pinMode(HDD_LED, INPUT);
+  pinMode(PWR_LED, INPUT_PULLUP);
+  pinMode(HDD_LED, INPUT_PULLUP);
 
   // 静電容量スイッチ
   pinMode(CAP_OUT, OUTPUT);
@@ -70,7 +70,7 @@ void fadePwrLed() {
     Serial.print(" PWR_LED: ");
     Serial.print(retVal);
   }
-  if (retVal == 1) {
+  if (retVal != 1) {
     fadeAllLEDs();
   } else {
     offAllLEDs();
@@ -80,12 +80,11 @@ void fadePwrLed() {
 // HDD LED の状態を確認し状況によりOnOffさせる
 void  checkHddLED() {
   int retVal = digitalRead(HDD_LED);
-  //  float retVal = analogRead(HDD_LED);
   if ( isDebug == 1)  {
     Serial.print(" HDD_LED: ");
     Serial.print(retVal);
   }
-  if (retVal == 1) {
+  if (retVal != 1) {
     turnOnLED(strip.Color(255, 0, 0), 11);
     if (isDebug == 1)  digitalWrite(BDY_LED, HIGH);
   } else {
@@ -118,13 +117,13 @@ void checkCapacitiveSensor() {
   tCap = 0;
 
   // パルスの立ち上げ
-  digitalWrite(8, HIGH);
+  digitalWrite(CAP_OUT, HIGH);
 
   // 立ち上がりまでの時間計測
-  while (digitalRead(9) != HIGH) tCap++;
+  while (digitalRead(CAP_IN) != HIGH) tCap++;
 
   // 放電するまで待つ
-  digitalWrite(8, LOW);
+  digitalWrite(CAP_OUT, LOW);
   delay(1);
 
   if ( isDebug == 1) {
