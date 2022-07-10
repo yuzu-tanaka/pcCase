@@ -13,8 +13,6 @@
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 // 入出力用PINの定義
-//#define RST_LED  3
-//#define RST_BTN  4
 #define PWR_LED     5
 #define PWR_BTN     4 //6
 #define HDD_LED     6 //7
@@ -84,7 +82,6 @@ void fadePwrLed() {
 // HDD LED の状態を確認し状況によりOnOffさせる
 void  checkHddLED() {
   int retVal = digitalRead(HDD_LED);
-  //  float retVal = analogRead(HDD_LED);
   if ( isDebug == 1)  {
     Serial.print(" HDD_LED: ");
     Serial.print(retVal);
@@ -119,30 +116,6 @@ void loop() {
 // 静電容量スイッチの入力チェック
 void checkCapacitiveSensor() {
   int retVal = 0;
-  //  tCap = 0;
-  //
-  //  // パルスの立ち上げ
-  //  digitalWrite(8, HIGH);
-  //
-  //  // 立ち上がりまでの時間計測
-  //  while (digitalRead(CAP_IN) != HIGH) tCap++;
-  //
-  //  // 放電するまで待つ
-  //  digitalWrite(CAP_OUT, LOW);
-  //  delay(1);
-  //
-  //  if ( isDebug == 1) {
-  //    Serial.print("  tCap:");
-  //    Serial.print(tCap);
-  //  }
-  //  // ローパスフィルタ
-  //  tCap = 0.8 * prevtCap + 0.2 * tCap;
-  //  prevtCap = tCap;
-  //
-  //  if ( isDebug == 1) {
-  //    Serial.print("  tCapLowPass:");
-  //    Serial.print(tCap);
-  //  }
   
   // 静電容量モジュールの反応チェック
   retVal = digitalRead(CAP_MOD_IN);
@@ -150,7 +123,6 @@ void checkCapacitiveSensor() {
   Serial.print(retVal);
 
   // LED点灯
-//  if ( tCap > thresCap ) {
   if ( retVal == 1) {
     digitalWrite(BDY_LED, HIGH);
     onFlgsUpdater(1);
